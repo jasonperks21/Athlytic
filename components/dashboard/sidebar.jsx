@@ -1,5 +1,5 @@
 'use client';
-import { BarChart3, Activity, Zap, Settings, Link as LinkIcon } from 'lucide-react';
+import { House, Activity, Zap, Settings, Link as LinkIcon, Brain } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -10,8 +10,8 @@ import { usePathname } from 'next/navigation';
 export function DashboardSidebar() {
   const pathname = usePathname();
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3, href: '/dashboard' },
-    { id: 'insights', label: 'AI Insights', icon: Zap, href: '/dashboard/ai-insights' },
+    { id: 'dashboard', label: 'Dashboard', icon: House, href: '/dashboard' },
+    { id: 'insights', label: 'AI Insights', icon: Brain, href: '/dashboard/ai-insights' },
     { id: 'metrics', label: 'Metrics', icon: Activity, href: '/dashboard/metrics' },
     { id: 'connections', label: 'Connections', icon: LinkIcon, href: '/dashboard/connections' },
     { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/settings' },
