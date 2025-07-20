@@ -179,7 +179,7 @@ export default function ConnectionsPage() {
   const availableCount = mockApps.length - connectedCount;
 
   return (
-    <div className="space-y-6 px-8 py-8">
+    <div className="space-y-6 p-2 sm:p-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg">
