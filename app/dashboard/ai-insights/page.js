@@ -1,57 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Zap, Clock, Heart, Apple, AlertTriangle, CheckCircle, Info, Brain } from 'lucide-react';
-
-// Mock data for demonstration
-const aiInsights = [
-  {
-    id: 1,
-    title: 'Improve Sleep Quality',
-    description: 'Your sleep quality has decreased by 10% this week. Consider adjusting your bedtime routine.',
-    category: 'sleep',
-    priority: 'high',
-    confidence: 85,
-    actionable: true,
-    recommendations: [
-      'Go to bed at the same time each night',
-      'Avoid screens 1 hour before bed',
-    ],
-  },
-  {
-    id: 2,
-    title: 'Increase Protein Intake',
-    description: 'Your protein intake is below recommended levels for muscle recovery.',
-    category: 'nutrition',
-    priority: 'medium',
-    confidence: 70,
-    actionable: true,
-    recommendations: [
-      'Add a protein-rich snack after workouts',
-    ],
-  },
-  {
-    id: 3,
-    title: 'Consistent Performance',
-    description: 'Your performance metrics have remained stable over the past month.',
-    category: 'performance',
-    priority: 'low',
-    confidence: 90,
-    actionable: false,
-    recommendations: [],
-  },
-  {
-    id: 4,
-    title: 'Faster Recovery',
-    description: 'Your recovery time has improved by 15% compared to last week.',
-    category: 'recovery',
-    priority: 'medium',
-    confidence: 80,
-    actionable: true,
-    recommendations: [
-      'Continue current stretching routine',
-    ],
-  },
-];
 
 // InsightCard component (JSX only, no TypeScript)
 const InsightCard = ({ insight }) => {
@@ -157,20 +106,65 @@ const InsightCard = ({ insight }) => {
   );
 };
 
+function ColorSpinCircle() {
+  return (
+    <span className="relative flex items-center justify-center w-5 h-5">
+      <span className="absolute inline-block w-5 h-5 rounded-full border-2 border-t-blue-400 border-r-purple-400 border-b-pink-400 border-l-transparent animate-spin" style={{ borderWidth: '3px' }}></span>
+    </span>
+  );
+}
+
 export default function AiInsightsPage() {
   const [filter, setFilter] = useState('all');
+  const [insights, setInsights] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  // On mount, load insights from sessionStorage if available
+  useEffect(() => {
+    const stored = sessionStorage.getItem('aiInsights');
+    if (stored) {
+      setInsights(JSON.parse(stored));
+    } else {
+      fetchInsights();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchInsights = async () => {
+    setIsLoading(true);
+    setHasError(false);
+    try {
+      const res = await fetch('/api/ai-insights', { method: 'POST' });
+      if (!res.ok) throw new Error('Failed to fetch insights');
+      const data = await res.json();
+      setInsights(data.insights || []);
+      sessionStorage.setItem('aiInsights', JSON.stringify(data.insights || []));
+    } catch (err) {
+      setHasError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // On 'Generate New Insights', clear and refetch
+  const handleRegenerate = () => {
+    sessionStorage.removeItem('aiInsights');
+    setInsights([]);
+    fetchInsights();
+  };
 
   const categories = [
-    { id: 'all', label: 'All Insights', count: aiInsights.length },
-    { id: 'performance', label: 'Performance', count: aiInsights.filter(i => i.category === 'performance').length },
-    { id: 'recovery', label: 'Recovery', count: aiInsights.filter(i => i.category === 'recovery').length },
-    { id: 'sleep', label: 'Sleep', count: aiInsights.filter(i => i.category === 'sleep').length },
-    { id: 'nutrition', label: 'Nutrition', count: aiInsights.filter(i => i.category === 'nutrition').length },
+    { id: 'all', label: 'All Insights', count: insights.length },
+    { id: 'performance', label: 'Performance', count: insights.filter(i => i.category === 'performance').length },
+    { id: 'recovery', label: 'Recovery', count: insights.filter(i => i.category === 'recovery').length },
+    { id: 'sleep', label: 'Sleep', count: insights.filter(i => i.category === 'sleep').length },
+    { id: 'nutrition', label: 'Nutrition', count: insights.filter(i => i.category === 'nutrition').length },
   ];
 
   const filteredInsights = filter === 'all' 
-    ? aiInsights 
-    : aiInsights.filter(insight => insight.category === filter);
+    ? insights 
+    : insights.filter(insight => insight.category === filter);
 
   const priorityOrder = { high: 3, medium: 2, low: 1 };
   const sortedInsights = [...filteredInsights].sort((a, b) => 
@@ -189,8 +183,16 @@ export default function AiInsightsPage() {
             <p className="text-gray-600 mt-1">Personalized recommendations powered by machine learning</p>
           </div>
         </div>
-        <button className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
-          <Zap className="w-4 h-4" />
+        <button
+          className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          onClick={handleRegenerate}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ColorSpinCircle />
+          ) : (
+            <Zap className="w-4 h-4" />
+          )}
           <span>Generate New Insights</span>
         </button>
       </div>
@@ -212,18 +214,30 @@ export default function AiInsightsPage() {
         ))}
       </div>
 
-      {/* Insights Grid */}
-      <div className="space-y-4">
-        {sortedInsights.map((insight) => (
-          <InsightCard key={insight.id} insight={insight} />
-        ))}
-      </div>
-
-      {filteredInsights.length === 0 && (
+      {/* Loading, Error, and Insights Grid */}
+      {isLoading ? (
+        <div className="text-center py-12">
+          <Brain className="w-12 h-12 text-gray-300 mx-auto mb-4 animate-spin" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Loading insights...</h3>
+          <p className="text-gray-500">Please wait while we generate your insights.</p>
+        </div>
+      ) : hasError ? (
+        <div className="text-center py-12">
+          <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Error loading insights</h3>
+          <p className="text-gray-500">There was a problem fetching your insights. Please try again later.</p>
+        </div>
+      ) : filteredInsights.length === 0 ? (
         <div className="text-center py-12">
           <Brain className="w-12 h-12 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No insights found</h3>
           <p className="text-gray-500">Try adjusting your filters or connect more apps for better insights.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {sortedInsights.map((insight, idx) => (
+            <InsightCard key={insight.id ?? `${insight.title}-${idx}`} insight={insight} />
+          ))}
         </div>
       )}
     </div>
