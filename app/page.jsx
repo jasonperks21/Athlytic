@@ -21,114 +21,17 @@ import {
   Clock,
 } from "lucide-react"
 import { GoToDashboardButton } from "@/components/GoToDashboardButton"
+import Header from "@/components/landing/header"
+import HeroSection from '@/components/landing/hero'
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-black">
       {/* Header */}
-      <header className="border-b border-zinc-800 bg-black/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-                <Activity className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-white">Athlytic</span>
-            </div>
-
-            <nav className="hidden lg:flex items-center space-x-8">
-              <a href="#features" className="text-zinc-400 hover:text-white transition-colors font-medium">
-                Features
-              </a>
-              <a href="#integrations" className="text-zinc-400 hover:text-white transition-colors font-medium">
-                Integrations
-              </a>
-              <a href="#pricing" className="text-zinc-400 hover:text-white transition-colors font-medium">
-                Pricing
-              </a>
-              <Button variant="ghost" className="text-zinc-400 hover:text-white">
-                Sign In
-              </Button>
-              <GoToDashboardButton
-                variant="primary"
-                className="font-semibold"
-              >
-                Go to Dashboard
-              </GoToDashboardButton>
-            </nav>
-
-            <Button variant="ghost" size="icon" className="lg:hidden text-white">
-              <Menu className="w-6 h-6" />
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
-      <section className="py-24 px-6 bg-gradient-to-b from-black to-zinc-900">
-        <div className="container mx-auto text-center max-w-6xl">
-          <Badge
-            variant="secondary"
-            className="mb-8 bg-orange-500/10 text-orange-400 border-orange-500/20 px-4 py-2 text-sm font-medium"
-          >
-            <Zap className="w-4 h-4 mr-2" />
-            AI-Powered Performance Analytics
-          </Badge>
-
-          <h1 className="text-6xl md:text-8xl font-black text-white mb-8 leading-tight tracking-tight">
-            Unlock Your
-            <span className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent block">
-              Athletic Potential
-            </span>
-          </h1>
-
-          <p className="text-xl md:text-2xl text-zinc-400 mb-12 max-w-4xl mx-auto leading-relaxed font-medium">
-            Connect your fitness apps, get AI-powered insights, and achieve your performance goals faster than ever.
-            Transform your health data into actionable intelligence.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-            <GoToDashboardButton
-              size="lg"
-              variant="primary"
-              className="text-lg px-10 py-6 font-semibold h-auto"
-            >
-              Go to Dashboard
-              <ArrowRight className="ml-3 w-5 h-5" />
-            </GoToDashboardButton>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white text-lg px-10 py-6 font-semibold h-auto bg-transparent"
-            >
-              <Play className="mr-3 w-5 h-5" />
-              Watch Demo
-            </Button>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-sm">
-              <CardContent className="p-8 text-center">
-                <div className="text-4xl font-black text-orange-500 mb-3">10K+</div>
-                <div className="text-zinc-400 font-medium">Active Athletes</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-sm">
-              <CardContent className="p-8 text-center">
-                <div className="text-4xl font-black text-orange-500 mb-3">25%</div>
-                <div className="text-zinc-400 font-medium">Avg Performance Boost</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-sm">
-              <CardContent className="p-8 text-center">
-                <div className="text-4xl font-black text-orange-500 mb-3">50+</div>
-                <div className="text-zinc-400 font-medium">App Integrations</div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Features Section */}
       <section id="features" className="py-24 px-6 bg-zinc-950">

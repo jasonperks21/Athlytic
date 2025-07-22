@@ -120,3 +120,32 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes spinner-pulse-1 {
+  0%, 100% { opacity: 0.5; }
+  33% { opacity: 1; }
+}
+
+@keyframes spinner-pulse-2 {
+  0%, 100% { opacity: 0.5; }
+  33% { opacity: 1; }
+}
+
+@keyframes spinner-pulse-3 {
+  0%, 100% { opacity: 0.5; }
+  33% { opacity: 1; }
+}
+
+.spinner-anim-1 {
+  animation: spinner-pulse-1 2.4s ease-in-out infinite;
+}
+
+.spinner-anim-2 {
+  animation: spinner-pulse-2 2.4s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+.spinner-anim-3 {
+  animation: spinner-pulse-3 2.4s ease-in-out infinite;
+  animation-delay: 1.6s;
+}
