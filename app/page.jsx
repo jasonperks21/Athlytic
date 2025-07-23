@@ -25,6 +25,7 @@ import Header from "@/components/landing/header"
 import HeroSection from '@/components/landing/hero'
 import Features from '@/components/landing/features'
 import GuideSection from '@/components/landing/guide'
+import IntegrationsSection from '@/components/landing/integrations'
 
 export default function LandingPage() {
   return (
@@ -42,108 +43,7 @@ export default function LandingPage() {
       <GuideSection />
 
       {/* Integrations Carousel */}
-      <section id="integrations" className="py-24 px-6 bg-zinc-950 overflow-hidden">
-        <div className="container mx-auto text-center max-w-6xl">
-          <Badge variant="outline" className="mb-6 border-zinc-700 text-zinc-400">
-            INTEGRATIONS
-          </Badge>
-          <h2 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight">Seamless Connections</h2>
-          <p className="text-xl text-zinc-400 mb-16 max-w-3xl mx-auto font-medium">
-            Connect with all your favorite fitness and health apps for comprehensive tracking
-          </p>
-
-          {/* Carousel Container */}
-          <div className="relative">
-            <div className="flex animate-scroll">
-              {/* First set of logos */}
-              <div className="flex space-x-8 min-w-full justify-around items-center">
-                {[
-                  { name: "Strava", color: "from-orange-600 to-red-600" },
-                  { name: "Oura", color: "from-blue-600 to-indigo-600" },
-                  { name: "MyFitnessPal", color: "from-blue-500 to-cyan-500" },
-                  { name: "Garmin", color: "from-blue-700 to-blue-800" },
-                  { name: "Fitbit", color: "from-teal-500 to-green-500" },
-                  { name: "Apple Health", color: "from-gray-600 to-gray-700" },
-                ].map((app) => (
-                  <Card
-                    key={app.name}
-                    className="flex-shrink-0 bg-zinc-900/50 border-zinc-800 hover:border-orange-500/50 transition-all duration-300 min-w-[200px] group"
-                  >
-                    <CardContent className="p-8 text-center">
-                      <div
-                        className={`w-16 h-16 bg-gradient-to-r ${app.color} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}
-                      >
-                        <Activity className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="text-white font-bold text-lg">{app.name}</div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Second set of logos */}
-              <div className="flex space-x-8 min-w-full justify-around items-center">
-                {[
-                  { name: "Google Fit", color: "from-green-500 to-blue-500" },
-                  { name: "Whoop", color: "from-red-600 to-pink-600" },
-                  { name: "Polar", color: "from-cyan-500 to-blue-500" },
-                  { name: "Suunto", color: "from-orange-500 to-red-500" },
-                  { name: "Zwift", color: "from-orange-600 to-yellow-500" },
-                  { name: "Peloton", color: "from-red-500 to-pink-500" },
-                ].map((app) => (
-                  <Card
-                    key={app.name}
-                    className="flex-shrink-0 bg-zinc-900/50 border-zinc-800 hover:border-orange-500/50 transition-all duration-300 min-w-[200px] group"
-                  >
-                    <CardContent className="p-8 text-center">
-                      <div
-                        className={`w-16 h-16 bg-gradient-to-r ${app.color} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}
-                      >
-                        <Activity className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="text-white font-bold text-lg">{app.name}</div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Third set (repeat for seamless loop) */}
-              <div className="flex space-x-8 min-w-full justify-around items-center">
-                {[
-                  { name: "Strava", color: "from-orange-600 to-red-600" },
-                  { name: "Oura", color: "from-blue-600 to-indigo-600" },
-                  { name: "MyFitnessPal", color: "from-blue-500 to-cyan-500" },
-                  { name: "Garmin", color: "from-blue-700 to-blue-800" },
-                  { name: "Fitbit", color: "from-teal-500 to-green-500" },
-                  { name: "Apple Health", color: "from-gray-600 to-gray-700" },
-                ].map((app) => (
-                  <Card
-                    key={`${app.name}-repeat`}
-                    className="flex-shrink-0 bg-zinc-900/50 border-zinc-800 hover:border-orange-500/50 transition-all duration-300 min-w-[200px] group"
-                  >
-                    <CardContent className="p-8 text-center">
-                      <div
-                        className={`w-16 h-16 bg-gradient-to-r ${app.color} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}
-                      >
-                        <Activity className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="text-white font-bold text-lg">{app.name}</div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            {/* Gradient overlays */}
-            <div className="absolute left-0 top-0 w-32 h-full bg-gradient-to-r from-zinc-950 to-transparent pointer-events-none z-10"></div>
-            <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-zinc-950 to-transparent pointer-events-none z-10"></div>
-          </div>
-
-          <Badge variant="secondary" className="mt-12 bg-zinc-800 text-zinc-300 px-4 py-2">
-            + 40 more integrations and growing
-          </Badge>
-        </div>
-      </section>
+      <IntegrationsSection />
 
       {/* Pricing */}
       <section id="pricing" className="py-24 px-6 bg-black">
