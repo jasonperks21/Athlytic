@@ -24,9 +24,9 @@ const LoadingSpinner = () => (
 
 const getVideoSource = (width) => {
   if (width >= 3840) return '/hero-video-2160p.mp4';
-  if (width >= 2560) return '/hero-video-2160p.mp4';
-  if (width >= 1820) return '/hero-video-2160p.mp4';
-  return '/hero-video-2160p.mp4';
+  if (width >= 2560) return '/hero-video-1440p.mp4';
+  if (width >= 1820) return '/hero-video-1080p.mp4';
+  return '/hero-video-720p.mp4';
 };
 
 const HeroSection = () => {
@@ -126,7 +126,7 @@ const HeroSection = () => {
       {/* Hero Text Content */}
       <div className="absolute inset-0 z-30 flex items-center justify-center px-4">
         <div className="max-w-[800px] text-center">
-          <h1 className="mb-6 text-[48px] font-medium leading-[1.1] tracking-[-0.02em] text-white">
+          <h1 className="mb-6 text-[48px] font-bold leading-[1.1] tracking-[-0.02em] text-white">
             <TextType 
               text={["A new era of\npersonal health"]}
               typingSpeed={75}

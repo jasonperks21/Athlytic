@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google'
 
 const inter = Inter({ 
   subsets: ['latin'],
-  weight: ['100', '400', '700'],
+  weight: ['200', '400'],
   display: 'swap',
   variable: '--font-inter',
 })
@@ -15,8 +15,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable}`}>
-      <body>{children}</body>
+    <html lang="en" className={`${inter.variable} font-sans antialiased`}>
+      <body className="font-extralight">{children}</body>
     </html>
   )
 }
