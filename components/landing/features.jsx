@@ -1,13 +1,20 @@
 'use client';
 
 import { Brain, Target, Zap, TrendingUp, Heart, ChartColumn } from "lucide-react";
-import GridMotion from '@/app/elements/GridMotion';
+import dynamic from 'next/dynamic';
 
-const FeatureCard = ({ icon: Icon, title, description, gradientFrom, gradientTo, hoverBorder }) => {
+// Lazy load GridMotion since it's heavy
+const GridMotion = dynamic(() => import('@/app/elements/GridMotion'), {
+  ssr: false,
+  loading: () => <div className="h-[600px] bg-gradient-radial from-orange-500/5 to-transparent" />
+});
+
+const FeatureCard = ({ icon: Icon, title, description, gradientFrom, gradientTo, hoverBorder, index }) => {
   return (
     <div 
       data-slot="card" 
-      className={`text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-lg bg-zinc-900/50 backdrop-blur-sm border-zinc-800/50 hover:border-${hoverBorder}/50 transition-all duration-300 group hover:shadow-2xl hover:shadow-${hoverBorder}/5 hover:-translate-y-1`}
+      className={`text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-lg bg-zinc-900/50 backdrop-blur-sm border-zinc-800/50 hover:border-${hoverBorder}/50 transition-all duration-300 group hover:shadow-2xl hover:shadow-${hoverBorder}/5 hover:-translate-y-1 animate-fade-in-up`}
+      style={{ animationDelay: `${index * 200}ms` }}
     >
       <div 
         data-slot="card-header" 
@@ -49,32 +56,32 @@ const Features = () => {
     },
     {
       icon: Zap,
-      title: "Multi-App Integration",
-      description: "Connect Strava, Oura, MyFitnessPal, and 50+ other apps for comprehensive health tracking and unified data analysis",
-      gradientFrom: "green",
-      gradientTo: "emerald",
-      hoverBorder: "green"
-    },
-    {
-      icon: TrendingUp,
-      title: "Performance Tracking",
-      description: "Monitor your progress with detailed analytics and beautiful visualizations of your improvement over time",
+      title: "Real-Time Analytics",
+      description: "Get instant feedback on your performance metrics with live data processing and immediate insights to optimize your training sessions",
       gradientFrom: "purple",
       gradientTo: "pink",
       hoverBorder: "purple"
     },
     {
+      icon: TrendingUp,
+      title: "Performance Optimization",
+      description: "Data-driven recommendations to systematically improve your athletic performance based on comprehensive analysis of your health metrics",
+      gradientFrom: "green",
+      gradientTo: "emerald",
+      hoverBorder: "green"
+    },
+    {
       icon: Heart,
-      title: "Health Optimization",
-      description: "Get actionable recommendations for sleep, nutrition, recovery, and training based on comprehensive data analysis",
-      gradientFrom: "yellow",
-      gradientTo: "orange",
-      hoverBorder: "yellow"
+      title: "Health Monitoring",
+      description: "Continuous tracking of vital health indicators with early warning systems to prevent overtraining and optimize recovery periods",
+      gradientFrom: "red",
+      gradientTo: "rose",
+      hoverBorder: "red"
     },
     {
       icon: ChartColumn,
-      title: "Advanced Analytics",
-      description: "Deep dive into your metrics with comprehensive dashboards and detailed performance reports that reveal insights",
+      title: "Advanced Reporting",
+      description: "Comprehensive reports with actionable insights, trend analysis, and progress tracking to keep you motivated and on track",
       gradientFrom: "indigo",
       gradientTo: "blue",
       hoverBorder: "indigo"
@@ -82,61 +89,79 @@ const Features = () => {
   ];
 
   const gridItems = [
-    '/runner.svg',
-    '/basketball.svg',
-    '/football.svg',
-    '/boxer.svg',
-    '/stretching.svg',
-    '/swimmer.svg',
-    '/runner.svg',
-    '/football.svg',
-    '/basketball.svg',
-    '/swimmer.svg',
-    '/boxer.svg',
-    '/stretching.svg',
-    '/basketball.svg',
-    '/runner.svg',
-    '/swimmer.svg',
-    '/stretching.svg',
-    '/football.svg',
-    '/boxer.svg',
-    '/runner.svg',
-    '/stretching.svg',
-    '/basketball.svg',
-    '/swimmer.svg',
-    '/football.svg',
-    '/boxer.svg',
-    '/stretching.svg',
-    '/runner.svg',
-    '/swimmer.svg',
-    '/basketball.svg'
+    '/integrations/strava.png',
+    '/integrations/oura.png', 
+    '/integrations/fitbit.png',
+    '/integrations/garmin.png',
+    '/integrations/whoop.png',
+    '/integrations/apple-health.png',
+    '/integrations/myfitnesspal.png',
+    'Performance Insights',
+    'AI Analysis',
+    'Goal Tracking',
+    'Health Metrics',
+    'Training Plans',
+    'Recovery Data',
+    'Nutrition Info',
+    'Sleep Analysis',
+    'Heart Rate',
+    'VO2 Max',
+    'Power Output',
+    'Cadence',
+    'Pace Analysis',
+    'Distance Tracking',
+    'Calorie Burn',
+    'Hydration',
+    'Stress Levels',
+    'Training Load',
+    'Recovery Score',
+    'Performance Trends',
+    'Injury Prevention'
   ];
 
   return (
-    <section id="features" className="relative py-24 px-6 bg-zinc-950">
-      <div className="absolute inset-0 left-0 right-0 top-0 bottom-0 w-full h-full overflow-hidden opacity-50">
-        <GridMotion items={gridItems} gradientColor="#EE7A1B" />
-      </div>
+    <section id="features" className="py-24 px-6 bg-black relative overflow-hidden">
       <div className="container mx-auto max-w-7xl relative z-10">
         <div className="text-center mb-20">
-          <span 
-            data-slot="badge" 
-            className="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden [a&]:hover:bg-accent [a&]:hover:text-accent-foreground mb-6 border-zinc-700 text-zinc-400"
-          >
-            POWERFUL FEATURES
-          </span>
-          <h2 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight">
-            Built for Peak Performance
+          <div className="inline-block px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-full text-zinc-400 text-sm font-medium mb-6 animate-fade-in">
+            FEATURES
+          </div>
+          <h2 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+            Why Athletes Choose Us
           </h2>
-          <p className="text-xl text-zinc-400 max-w-3xl mx-auto font-medium">
-            Everything you need to analyze, understand, and optimize your athletic performance with cutting-edge AI
+          <p className="text-xl text-zinc-400 max-w-3xl mx-auto font-medium animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+            Leverage cutting-edge AI to unlock your athletic potential with personalized insights and data-driven recommendations
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
           {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} />
+            <FeatureCard 
+              key={index}
+              icon={feature.icon}
+              title={feature.title}
+              description={feature.description}
+              gradientFrom={feature.gradientFrom}
+              gradientTo={feature.gradientTo}
+              hoverBorder={feature.hoverBorder}
+              index={index}
+            />
           ))}
         </div>
+
+        <div className="text-center mb-12">
+          <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 animate-fade-in-up" style={{ animationDelay: '800ms' }}>
+            Powered by Your Data
+          </h3>
+          <p className="text-lg text-zinc-400 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '1000ms' }}>
+            Connect all your favorite fitness apps and devices for comprehensive analysis
+          </p>
+        </div>
+      </div>
+
+      {/* Background Grid Motion - Lazy Loaded */}
+      <div className="absolute inset-0 z-0 opacity-30">
+        <GridMotion items={gridItems} gradientColor="#EE7A1B" />
       </div>
     </section>
   );

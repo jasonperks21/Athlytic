@@ -1,7 +1,16 @@
 'use client';
 import React from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import dynamic from "next/dynamic";
 import { House, Calendar, Clock, Target } from "lucide-react";
+
+// Lazy load chart components
+const LineChart = dynamic(() => import('recharts').then(mod => ({ default: mod.LineChart })), { ssr: false });
+const Line = dynamic(() => import('recharts').then(mod => ({ default: mod.Line })), { ssr: false });
+const XAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.XAxis })), { ssr: false });
+const YAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.YAxis })), { ssr: false });
+const CartesianGrid = dynamic(() => import('recharts').then(mod => ({ default: mod.CartesianGrid })), { ssr: false });
+const Tooltip = dynamic(() => import('recharts').then(mod => ({ default: mod.Tooltip })), { ssr: false });
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => ({ default: mod.ResponsiveContainer })), { ssr: false });
 
 // Mock health metrics data (replace with real data or import as needed)
 const healthMetrics = [
@@ -48,182 +57,117 @@ const healthMetrics = [
     unit: "km",
     trend: "+8%",
     trendType: "up",
-    value: 32.5,
+    value: 45,
     data: [
-      { date: "2024-05-01", value: 28 },
-      { date: "2024-05-02", value: 29 },
-      { date: "2024-05-03", value: 30 },
-      { date: "2024-05-04", value: 31 },
-      { date: "2024-05-05", value: 32 },
-      { date: "2024-05-06", value: 33 },
-      { date: "2024-05-07", value: 32.5 },
-    ],
-  },
-  {
-    id: "restingHR",
-    label: "Resting HR",
-    source: "Oura Ring",
-    unit: "bpm",
-    trend: "-2%",
-    trendType: "down",
-    value: 58,
-    data: [
-      { date: "2024-05-01", value: 60 },
-      { date: "2024-05-02", value: 59 },
-      { date: "2024-05-03", value: 58 },
-      { date: "2024-05-04", value: 57 },
-      { date: "2024-05-05", value: 58 },
-      { date: "2024-05-06", value: 59 },
-      { date: "2024-05-07", value: 58 },
+      { date: "2024-05-01", value: 42 },
+      { date: "2024-05-02", value: 38 },
+      { date: "2024-05-03", value: 45 },
+      { date: "2024-05-04", value: 41 },
+      { date: "2024-05-05", value: 47 },
+      { date: "2024-05-06", value: 43 },
+      { date: "2024-05-07", value: 45 },
     ],
   },
 ];
 
-// Combine data for charting
-const combinedData = healthMetrics[0].data.map((item, index) => ({
-  date: item.date,
-  sleepScore: healthMetrics[0].data[index]?.value || 0,
-  hrv: healthMetrics[1].data[index]?.value || 0,
-  distance: healthMetrics[2].data[index]?.value || 0,
-  restingHR: healthMetrics[3].data[index]?.value || 0,
-}));
-
-// Quick stats for the top cards
-const quickStats = [
-  { label: "This Week", value: "5 workouts", icon: Target, color: "blue" },
-  { label: "Total Distance", value: "32.5 km", icon: Calendar, color: "green" },
-  { label: "Avg Sleep", value: "7h 34m", icon: Clock, color: "purple" },
-];
-
-// MetricCard subcomponent
-function MetricCard({ metric }) {
-  const isUp = metric.trendType === "up";
-  return (
-    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-gray-500 text-sm">{metric.label}</span>
-        <span className="bg-gray-100 text-xs px-2 py-1 rounded">{metric.source}</span>
+const MetricCard = ({ metric }) => (
+  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <div className="flex items-center justify-between mb-6">
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900">{metric.label}</h3>
+        <p className="text-sm text-gray-500 mt-1">From {metric.source}</p>
       </div>
-      <span className="text-2xl font-bold">
-        {metric.value} <span className="text-base font-normal text-gray-400">{metric.unit}</span>
-      </span>
-      <span className={`text-xs mt-1 ${isUp ? "text-green-600" : "text-red-500"}`}>
-        {isUp ? "▲" : "▼"} {metric.trend} <span className="text-gray-400">vs last week</span>
-      </span>
+      <div className="text-right">
+        <div className="text-2xl font-bold text-gray-900">{metric.value}<span className="text-sm text-gray-500 font-normal ml-1">{metric.unit}</span></div>
+        <div className={`text-sm font-medium ${
+          metric.trendType === 'up' ? 'text-green-600' : 
+          metric.trendType === 'down' ? 'text-red-600' : 'text-gray-500'
+        }`}>
+          {metric.trend} this week
+        </div>
+      </div>
     </div>
-  );
-}
+    
+    <div className="h-32">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={metric.data}>
+          <Line 
+            type="monotone" 
+            dataKey="value" 
+            stroke="#3b82f6" 
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+);
 
 export default function Dashboard() {
   return (
-    <div className="space-y-6 min-h-screen bg-gray-50 p-2 sm:p-3 font-sans">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-            <House className="w-6 h-6 text-blue-600" />
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-2 text-gray-500 text-sm mb-2">
+            <House className="w-4 h-4" />
+            <span>Dashboard</span>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-            <p className="text-gray-600 mt-1">Your health and performance overview</p>
-          </div>
+          <h1 className="text-4xl font-bold text-gray-900">Welcome back!</h1>
+          <p className="text-gray-600 mt-2">Here&apos;s what&apos;s happening with your health today.</p>
         </div>
-        <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-          <button className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            Last 7 days
-          </button>
-          <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
-            Generate Report
-          </button>
-        </div>
-      </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {quickStats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <div key={index} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-              <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-lg bg-${stat.color}-50`}>
-                  <Icon className={`w-5 h-5 text-${stat.color}-600`} />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">{stat.label}</p>
-                  <p className="text-lg font-semibold text-gray-900">{stat.value}</p>
-                </div>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                                 <p className="text-blue-100 text-sm">Today&apos;s Activities</p>
+                 <p className="text-3xl font-bold">3</p>
+               </div>
+               <Calendar className="w-8 h-8 text-blue-200" />
+             </div>
+           </div>
+           
+           <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white">
+             <div className="flex items-center justify-between">
+               <div>
+                 <p className="text-green-100 text-sm">Weekly Goal</p>
+                <p className="text-3xl font-bold">78%</p>
+              </div>
+              <Target className="w-8 h-8 text-green-200" />
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-purple-100 text-sm">Active Time</p>
+                <p className="text-3xl font-bold">4.2h</p>
+              </div>
+              <Clock className="w-8 h-8 text-purple-200" />
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-orange-100 text-sm">Calories</p>
+                <p className="text-3xl font-bold">2,847</p>
+              </div>
+              <div className="w-8 h-8 bg-orange-200 rounded-full flex items-center justify-center">
+                <span className="text-orange-600 font-bold text-sm">🔥</span>
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {healthMetrics.map((metric) => (
-          <MetricCard key={metric.id} metric={metric} />
-        ))}
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Sleep & HRV Trends</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={combinedData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 12 }}
-                tickFormatter={(value) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-              />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="sleepScore"
-                stroke="#3b82f6"
-                strokeWidth={2}
-                name="Sleep Score"
-              />
-              <Line
-                type="monotone"
-                dataKey="hrv"
-                stroke="#8b5cf6"
-                strokeWidth={2}
-                name="HRV"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          </div>
         </div>
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Training Load</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={combinedData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 12 }}
-                tickFormatter={(value) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-              />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="distance"
-                stroke="#10b981"
-                strokeWidth={2}
-                name="Distance (km)"
-              />
-              <Line
-                type="monotone"
-                dataKey="restingHR"
-                stroke="#f59e0b"
-                strokeWidth={2}
-                name="Resting HR"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+
+        {/* Health Metrics Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {healthMetrics.map((metric) => (
+            <MetricCard key={metric.id} metric={metric} />
+          ))}
         </div>
       </div>
     </div>

@@ -1,7 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import dynamic from 'next/dynamic';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+
+// Lazy load the chart components to reduce initial bundle size
+const LineChart = dynamic(() => import('recharts').then(mod => ({ default: mod.LineChart })), { ssr: false });
+const Line = dynamic(() => import('recharts').then(mod => ({ default: mod.Line })), { ssr: false });
+const XAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.XAxis })), { ssr: false });
+const YAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.YAxis })), { ssr: false });
+const CartesianGrid = dynamic(() => import('recharts').then(mod => ({ default: mod.CartesianGrid })), { ssr: false });
+const Tooltip = dynamic(() => import('recharts').then(mod => ({ default: mod.Tooltip })), { ssr: false });
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => ({ default: mod.ResponsiveContainer })), { ssr: false });
 
 /**
  * MetricDetail component displays detailed information and a trend chart for a health metric.
@@ -23,6 +32,16 @@ function MetricDetail({ metric }) {
     if (metric.trendType === 'down') return 'text-red-600';
     return 'text-gray-500';
   };
+
+  // Calculate statistics only once
+  const stats = React.useMemo(() => {
+    const values = metric.data.map(d => d.value);
+    return {
+      peak: Math.max(...values),
+      average: Math.round(values.reduce((sum, val) => sum + val, 0) / values.length),
+      lowest: Math.min(...values)
+    };
+  }, [metric.data]);
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -78,21 +97,15 @@ function MetricDetail({ metric }) {
 
       <div className="mt-6 grid grid-cols-3 gap-4">
         <div className="text-center">
-          <p className="text-2xl font-bold text-gray-900">
-            {Math.max(...metric.data.map(d => d.value))}
-          </p>
+          <p className="text-2xl font-bold text-gray-900">{stats.peak}</p>
           <p className="text-sm text-gray-500">Peak</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-gray-900">
-            {Math.round(metric.data.reduce((sum, d) => sum + d.value, 0) / metric.data.length)}
-          </p>
+          <p className="text-2xl font-bold text-gray-900">{stats.average}</p>
           <p className="text-sm text-gray-500">Average</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-gray-900">
-            {Math.min(...metric.data.map(d => d.value))}
-          </p>
+          <p className="text-2xl font-bold text-gray-900">{stats.lowest}</p>
           <p className="text-sm text-gray-500">Lowest</p>
         </div>
       </div>

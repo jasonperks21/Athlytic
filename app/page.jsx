@@ -1,31 +1,116 @@
+'use client';
+
+import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import {
   Activity,
-  Brain,
-  Target,
-  Zap,
-  TrendingUp,
   CheckCircle,
   ArrowRight,
-  Heart,
-  BarChart3,
-  Smartphone,
   Star,
-  Menu,
-  Play,
   Users,
   Shield,
   Clock,
 } from "lucide-react"
 import { GoToDashboardButton } from "@/components/GoToDashboardButton"
-import Header from "@/components/landing/header"
-import HeroSection from '@/components/landing/hero'
-import Features from '@/components/landing/features'
-import GuideSection from '@/components/landing/guide'
-import IntegrationsSection from '@/components/landing/integrations'
+
+// Lazy load heavy components - now possible with client component
+const Header = dynamic(() => import("@/components/landing/header"), {
+  ssr: true,
+})
+const HeroSection = dynamic(() => import('@/components/landing/hero'), {
+  ssr: false, // Hero can be client-side only to reduce initial bundle
+  loading: () => <div className="h-screen bg-black" />
+})
+const Features = dynamic(() => import('@/components/landing/features'), {
+  ssr: false,
+  loading: () => <div className="py-24 bg-black" />
+})
+const GuideSection = dynamic(() => import('@/components/landing/guide'), {
+  ssr: false,
+  loading: () => <div className="py-24 bg-black" />
+})
+const IntegrationsSection = dynamic(() => import('@/components/landing/integrations'), {
+  ssr: false,
+  loading: () => <div className="py-24 bg-black" />
+})
+
+// Move pricing data to separate object to reduce initial bundle
+const pricingPlans = [
+  {
+    id: "starter",
+    name: "Starter",
+    description: "Perfect for getting started",
+    price: "Free",
+    period: "Forever",
+    features: [
+      "Connect up to 3 apps",
+      "Basic AI insights", 
+      "Weekly reports",
+      "Community support"
+    ],
+    popular: false,
+    variant: "outline"
+  },
+  {
+    id: "pro", 
+    name: "Pro",
+    description: "For serious athletes",
+    price: "$29",
+    period: "/month",
+    features: [
+      "Unlimited app connections",
+      "Advanced AI insights",
+      "Daily recommendations", 
+      "Goal tracking & coaching",
+      "Priority support"
+    ],
+    popular: true,
+    variant: "primary"
+  },
+  {
+    id: "elite",
+    name: "Elite", 
+    description: "For teams and coaches",
+    price: "$99",
+    period: "/month",
+    features: [
+      "Everything in Pro",
+      "Team management",
+      "Custom integrations",
+      "Advanced analytics",
+      "Dedicated support"
+    ],
+    popular: false,
+    variant: "outline"
+  }
+]
+
+const testimonials = [
+  {
+    name: "Sarah Martinez",
+    role: "Marathon Runner",
+    initials: "SM",
+    gradient: "from-orange-500 to-red-500",
+    text: "Athlytic helped me identify the perfect balance between training intensity and recovery. My marathon time improved by 15 minutes!"
+  },
+  {
+    name: "Mike Johnson", 
+    role: "Triathlete",
+    initials: "MJ",
+    gradient: "from-blue-500 to-cyan-500",
+    text: "The AI insights are incredible. It spotted patterns in my sleep and nutrition that I never would have noticed on my own."
+  },
+  {
+    name: "Lisa Chen",
+    role: "Performance Coach", 
+    initials: "LC",
+    gradient: "from-green-500 to-emerald-500",
+    text: "As a coach, Athlytic gives me unprecedented insights into my athletes' performance. Game changer for our team."
+  }
+]
 
 export default function LandingPage() {
   return (
@@ -59,124 +144,50 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <Card className="bg-zinc-900/50 border-zinc-800 relative">
-              <CardHeader className="pb-8">
-                <CardTitle className="text-white text-3xl font-bold">Starter</CardTitle>
-                <CardDescription className="text-zinc-400 text-lg">Perfect for getting started</CardDescription>
-                <div className="text-5xl font-black text-white mt-6">Free</div>
-                <p className="text-zinc-500">Forever</p>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <ul className="space-y-4">
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Connect up to 3 apps</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Basic AI insights</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Weekly reports</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Community support</span>
-                  </li>
-                </ul>
-                <GoToDashboardButton
-                  className="w-full bg-transparent border-2 border-zinc-700 hover:bg-zinc-800 text-white font-semibold py-6"
-                  variant="outline"
-                >
-                  Go to Dashboard
-                </GoToDashboardButton>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-b from-orange-500/10 to-red-500/10 border-orange-500 relative scale-105">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 font-bold">
-                  MOST POPULAR
-                </Badge>
-              </div>
-              <CardHeader className="pb-8">
-                <CardTitle className="text-white text-3xl font-bold">Pro</CardTitle>
-                <CardDescription className="text-zinc-400 text-lg">For serious athletes</CardDescription>
-                <div className="text-5xl font-black text-white mt-6">
-                  $29<span className="text-xl text-zinc-400 font-normal">/month</span>
-                </div>
-                <p className="text-zinc-500">Billed monthly</p>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <ul className="space-y-4">
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Unlimited app connections</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Advanced AI insights</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Daily recommendations</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Goal tracking & coaching</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Priority support</span>
-                  </li>
-                </ul>
-                <GoToDashboardButton className="w-full font-semibold py-6" variant="primary">
-                  Go to Dashboard
-                </GoToDashboardButton>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-zinc-900/50 border-zinc-800 relative">
-              <CardHeader className="pb-8">
-                <CardTitle className="text-white text-3xl font-bold">Elite</CardTitle>
-                <CardDescription className="text-zinc-400 text-lg">For teams and coaches</CardDescription>
-                <div className="text-5xl font-black text-white mt-6">
-                  $99<span className="text-xl text-zinc-400 font-normal">/month</span>
-                </div>
-                <p className="text-zinc-500">Up to 10 athletes</p>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <ul className="space-y-4">
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Everything in Pro</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Team management</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Custom integrations</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Advanced analytics</span>
-                  </li>
-                  <li className="flex items-center text-zinc-300">
-                    <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
-                    <span className="text-base">Dedicated support</span>
-                  </li>
-                </ul>
-                <GoToDashboardButton
-                  className="w-full bg-transparent border-2 border-zinc-700 hover:bg-zinc-800 text-white font-semibold py-6"
-                  variant="outline"
-                >
-                  Go to Dashboard
-                </GoToDashboardButton>
-              </CardContent>
-            </Card>
+            {pricingPlans.map((plan) => (
+              <Card 
+                key={plan.id}
+                className={`${plan.popular 
+                  ? 'bg-gradient-to-b from-orange-500/10 to-red-500/10 border-orange-500 relative scale-105' 
+                  : 'bg-zinc-900/50 border-zinc-800'} relative`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 font-bold">
+                      MOST POPULAR
+                    </Badge>
+                  </div>
+                )}
+                <CardHeader className="pb-8">
+                  <CardTitle className="text-white text-3xl font-bold">{plan.name}</CardTitle>
+                  <CardDescription className="text-zinc-400 text-lg">{plan.description}</CardDescription>
+                  <div className="text-5xl font-black text-white mt-6">
+                    {plan.price}{plan.period !== "Forever" && <span className="text-xl text-zinc-400 font-normal">{plan.period}</span>}
+                  </div>
+                  <p className="text-zinc-500">{plan.period === "Forever" ? plan.period : "Billed monthly"}</p>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <ul className="space-y-4">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-center text-zinc-300">
+                        <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
+                        <span className="text-base">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <GoToDashboardButton
+                    className={`w-full font-semibold py-6 ${
+                      plan.variant === 'outline' 
+                        ? 'bg-transparent border-2 border-zinc-700 hover:bg-zinc-800 text-white' 
+                        : ''
+                    }`}
+                    variant={plan.variant}
+                  >
+                    Go to Dashboard
+                  </GoToDashboardButton>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -195,74 +206,29 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="bg-zinc-900/50 border-zinc-800">
-              <CardContent className="p-8">
-                <div className="flex mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-6 h-6 text-yellow-500 fill-current" />
-                  ))}
-                </div>
-                <p className="text-zinc-300 mb-8 text-lg leading-relaxed">
-                  "Athlytic helped me identify the perfect balance between training intensity and recovery. My marathon
-                  time improved by 15 minutes!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-bold text-lg">SM</span>
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="bg-zinc-900/50 border-zinc-800">
+                <CardContent className="p-8">
+                  <div className="flex mb-6">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-6 h-6 text-yellow-500 fill-current" />
+                    ))}
                   </div>
-                  <div>
-                    <div className="text-white font-bold text-lg">Sarah Martinez</div>
-                    <div className="text-zinc-400">Marathon Runner</div>
+                  <p className="text-zinc-300 mb-8 text-lg leading-relaxed">
+                    "{testimonial.text}"
+                  </p>
+                  <div className="flex items-center">
+                    <div className={`w-14 h-14 bg-gradient-to-r ${testimonial.gradient} rounded-full flex items-center justify-center mr-4`}>
+                      <span className="text-white font-bold text-lg">{testimonial.initials}</span>
+                    </div>
+                    <div>
+                      <div className="text-white font-bold text-lg">{testimonial.name}</div>
+                      <div className="text-zinc-400">{testimonial.role}</div>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-zinc-900/50 border-zinc-800">
-              <CardContent className="p-8">
-                <div className="flex mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-6 h-6 text-yellow-500 fill-current" />
-                  ))}
-                </div>
-                <p className="text-zinc-300 mb-8 text-lg leading-relaxed">
-                  "The AI insights are incredible. It spotted patterns in my sleep and nutrition that I never would have
-                  noticed on my own."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-bold text-lg">MJ</span>
-                  </div>
-                  <div>
-                    <div className="text-white font-bold text-lg">Mike Johnson</div>
-                    <div className="text-zinc-400">Triathlete</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-zinc-900/50 border-zinc-800">
-              <CardContent className="p-8">
-                <div className="flex mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-6 h-6 text-yellow-500 fill-current" />
-                  ))}
-                </div>
-                <p className="text-zinc-300 mb-8 text-lg leading-relaxed">
-                  "As a coach, Athlytic gives me unprecedented insights into my athletes' performance. Game changer for
-                  our team."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-bold text-lg">LC</span>
-                  </div>
-                  <div>
-                    <div className="text-white font-bold text-lg">Lisa Chen</div>
-                    <div className="text-zinc-400">Performance Coach</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -317,9 +283,6 @@ export default function LandingPage() {
                 </Button>
                 <Button size="icon" variant="ghost" className="text-zinc-400 hover:text-white">
                   <Activity className="w-5 h-5" />
-                </Button>
-                <Button size="icon" variant="ghost" className="text-zinc-400 hover:text-white">
-                  <Target className="w-5 h-5" />
                 </Button>
               </div>
             </div>

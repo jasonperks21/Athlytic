@@ -1,22 +1,29 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import TextType from '@/app/elements/TextType';
-import { gsap } from 'gsap';
+import dynamic from 'next/dynamic';
+
+// Lazy load TextType component
+const TextType = dynamic(() => import('@/app/elements/TextType'), {
+  ssr: false,
+  loading: () => <div className="text-[48px] font-bold leading-[1.1] tracking-[-0.02em] text-white min-h-[120px]">A new era of personal health</div>
+});
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center gap-4">
     {Array.from({ length: 3 }, (_, i) => (
       <div 
         key={`spinner-left-${i + 1}`} 
-        className={`z-10 h-[2px] w-6 bg-white/50 md:h-1 md:w-8 spinner-anim-${i + 1}`} 
+        className={`z-10 h-[2px] w-6 bg-white/50 md:h-1 md:w-8 animate-pulse`} 
+        style={{ animationDelay: `${i * 0.2}s` }}
       />
     ))}
     <div className="font-mono-md z-10">Loading</div>
     {Array.from({ length: 3 }, (_, i) => (
       <div 
         key={`spinner-right-${i + 1}`} 
-        className={`z-10 h-[2px] w-6 bg-white/50 md:h-1 md:w-8 spinner-anim-${i + 1}`} 
+        className={`z-10 h-[2px] w-6 bg-white/50 md:h-1 md:w-8 animate-pulse`} 
+        style={{ animationDelay: `${i * 0.2}s` }}
       />
     ))}
   </div>
@@ -32,10 +39,9 @@ const getVideoSource = (width) => {
 const HeroSection = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showVideo, setShowVideo] = useState(false);
+  const [showContent, setShowContent] = useState(false);
   const [videoSrc, setVideoSrc] = useState('');
   
-  const paragraphRef = useRef(null);
-  const buttonRef = useRef(null);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -49,59 +55,39 @@ const HeroSection = () => {
   }, []);
 
   useEffect(() => {
-    // Hide loading screen after minimum duration
-    const timer = setTimeout(() => setIsLoading(false), 3500);
-    return () => clearTimeout(timer);
-  }, []);
+    // Show content after a short delay for better UX
+    const contentTimer = setTimeout(() => {
+      setIsLoading(false);
+      setShowContent(true);
+    }, 2000);
 
-  useEffect(() => {
-    const TYPING_SPEED = 75;
-    const TYPING_TEXT = "A new era of\npersonal health";
-    const textTypeDelay = TYPING_TEXT.length * TYPING_SPEED + 800; // Text length * speed + pause
-
-    gsap.set([paragraphRef.current, buttonRef.current], { 
-      opacity: 0,
-      y: 20
-    });
-
-    const tl = gsap.timeline({ delay: textTypeDelay / 1000 });
-
-    tl.to(paragraphRef.current, {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      ease: "power2.out"
-    })
-    .to(buttonRef.current, {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      ease: "power2.out"
-    }, "-=0.4")
-    .add(() => {
+    // Show video slightly later
+    const videoTimer = setTimeout(() => {
       setShowVideo(true);
-      videoRef.current?.play();
-    });
+      if (videoRef.current) {
+        videoRef.current.play().catch(console.warn);
+      }
+    }, 2500);
+
+    return () => {
+      clearTimeout(contentTimer);
+      clearTimeout(videoTimer);
+    };
   }, []);
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
       {/* Loading Spinner */}
       <div 
-        className="pointer-events-none fixed inset-0 z-[9999999999] flex items-center justify-center bg-black text-white/50"
-        style={{ 
-          opacity: isLoading ? 1 : 0,
-          transition: 'opacity 0.5s ease-in-out'
-        }}
+        className={`pointer-events-none fixed inset-0 z-[9999999999] flex items-center justify-center bg-black text-white/50 transition-opacity duration-500 ${
+          isLoading ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
       >
         <LoadingSpinner />
       </div>
 
       {/* Black Overlay */}
-      <div 
-        className="absolute inset-0 z-20 bg-black/20"
-        style={{ transition: 'opacity 3.5s' }}
-      />
+      <div className="absolute inset-0 z-20 bg-black/20" />
 
       {/* Video Background */}
       {videoSrc && (
@@ -109,17 +95,19 @@ const HeroSection = () => {
           ref={videoRef}
           key={videoSrc}
           playsInline
-          webkit-playsinline="true"
           muted
           preload="metadata"
-          className={`absolute left-0 top-0 h-full w-full object-cover object-center transition-opacity duration-1000 ${showVideo ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute left-0 top-0 h-full w-full object-cover object-center transition-opacity duration-1000 ${
+            showVideo ? 'opacity-100' : 'opacity-0'
+          }`}
           onLoadedData={() => setIsLoading(false)}
           loop
+          poster="/hero-poster.jpg" // Add a poster image for better loading UX
         >
           <source src={videoSrc} type="video/mp4" />
-          <h1 className="bg-white p-12 text-4xl text-black">
+          <div className="bg-white p-12 text-4xl text-black">
             Your browser does not support the video tag.
-          </h1>
+          </div>
         </video>
       )}
 
@@ -127,28 +115,40 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-30 flex items-center justify-center px-4">
         <div className="max-w-[800px] text-center">
           <h1 className="mb-6 text-[48px] font-bold leading-[1.1] tracking-[-0.02em] text-white">
-            <TextType 
-              text={["A new era of\npersonal health"]}
-              typingSpeed={75}
-              pauseDuration={1500}
-              showCursor={false}
-              cursorCharacter="_" 
-            />
+            {showContent ? (
+              <TextType 
+                text={["A new era of\npersonal health"]}
+                typingSpeed={75}
+                pauseDuration={1500}
+                showCursor={false}
+                cursorCharacter="_" 
+              />
+            ) : (
+              <span className="opacity-0">A new era of personal health</span>
+            )}
           </h1>
-          <p ref={paragraphRef} className="mx-auto mb-8 text-[21px] font-light leading-[1.2] tracking-[-0.01em] text-white/70">
+          <p 
+            className={`mx-auto mb-8 text-[21px] font-light leading-[1.2] tracking-[-0.01em] text-white/70 transition-all duration-800 delay-[3000ms] ${
+              showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
             50+ supported apps, 10k active athletes,<br />
             25% average performance boost. All just for $10/month.
           </p>
-          <div ref={buttonRef} className="mt-8">
+          <div 
+            className={`mt-8 transition-all duration-800 delay-[3500ms] ${
+              showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
             <a 
               href="/dashboard" 
-              className="inline-block cursor-pointer font-mono text-sm tracking-wide"
+              className="inline-block cursor-pointer font-mono text-sm tracking-wide group"
             >
               <div className="relative">
-                <div className="relative z-10 bg-white px-8 py-4 text-zinc-900">
+                <div className="relative z-10 bg-white px-8 py-4 text-zinc-900 transition-all duration-300 group-hover:bg-zinc-100">
                   JOIN TODAY
                 </div>
-                <div className="absolute inset-0 z-0 bg-white blur-2xl [@supports(-webkit-hyphens:none)]:hidden"></div>
+                <div className="absolute inset-0 z-0 bg-white blur-2xl opacity-50 transition-opacity duration-300 group-hover:opacity-75"></div>
               </div>
             </a>
           </div>
